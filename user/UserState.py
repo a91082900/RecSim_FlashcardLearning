@@ -6,7 +6,7 @@ class UserState(user.AbstractUserState):
   def __init__(self, num_candidates, time_budget):
     self._cards = num_candidates
     self._history = np.zeros((num_candidates, 3))
-    self._last_review = np.zeros((num_candidates,))
+    self._last_review = np.repeat(-1.0, num_candidates)
     self._time_budget = time_budget
     self._time = 0
     self._W = np.zeros((num_candidates, 3))
