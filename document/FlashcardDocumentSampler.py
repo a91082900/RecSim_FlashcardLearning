@@ -9,6 +9,6 @@ class FlashcardDocumentSampler(document.AbstractDocumentSampler):
   def sample_document(self):
     doc_features = {}
     doc_features['doc_id'] = self._doc_count
-    doc_features['difficulty'] = self._rng.random_sample((1, 3))
+    doc_features['difficulty'] = self._rng.uniform(0, 5, (1, 3))
     self._doc_count += 1
     return self._doc_ctor(**doc_features)

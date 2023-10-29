@@ -52,7 +52,7 @@ class FlashcardUserModel(user.AbstractUserModel):
     doc_id = doc._doc_id
     W = self._user_state._W[doc_id]
     if not W.any(): # uninitialzed
-      self._user_state._W[doc_id] = W = doc.base_difficulty + np.random.uniform(-0.5, 0.5, (1, 3)) # a uniform error for each user
+      self._user_state._W[doc_id] = W = doc.base_difficulty * np.random.uniform(0.5, 2.0, (1, 3)) # a uniform error for each user
       print(W)
     # use exponential function to simulate whether the user recalls
     last_review = self._user_state._time - self._user_state._last_review[doc_id]
