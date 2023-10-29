@@ -5,7 +5,7 @@ from document import FlashcardDocumentSampler
 from recsim.simulator import recsim_gym
 from recsim.agents import full_slate_q_agent
 from recsim.simulator import runner_lib
-from agent import create_create_agent
+from agent import create_agent_helper
 from util import reward, update_metrics
 
 slate_size = 1
@@ -14,7 +14,7 @@ time_budget = 60
 
 tf.compat.v1.disable_eager_execution()
 
-create_agent_fn = create_create_agent(full_slate_q_agent.FullSlateQAgent)
+create_agent_fn = create_agent_helper(full_slate_q_agent.FullSlateQAgent)
 
 ltsenv = environment.Environment(
   FlashcardUserModel(num_candidates, time_budget, slate_size),
@@ -31,7 +31,7 @@ runner = runner_lib.TrainRunner(
     base_dir=tmp_base_dir,
     create_agent_fn=create_agent_fn,
     env=lts_gym_env,
-    episode_log_file="",
+    episode_log_file="episode.log",
     max_training_steps=5,
     num_iterations=1
 )
