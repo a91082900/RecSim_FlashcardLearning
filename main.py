@@ -17,8 +17,8 @@ tf.compat.v1.disable_eager_execution()
 create_agent_fn = create_agent_helper(full_slate_q_agent.FullSlateQAgent)
 
 ltsenv = environment.Environment(
-  FlashcardUserModel(num_candidates, time_budget, slate_size),
-  FlashcardDocumentSampler(),
+  FlashcardUserModel(num_candidates, time_budget, slate_size, seed=0, sample_seed=0),
+  FlashcardDocumentSampler(seed=0),
   num_candidates,
   slate_size,
   resample_documents=False)

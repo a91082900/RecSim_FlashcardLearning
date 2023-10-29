@@ -7,13 +7,14 @@ from util import eval_result
 import numpy as np
 
 class FlashcardUserModel(user.AbstractUserModel):
-  def __init__(self, num_candidates, time_budget, slate_size, seed=0):
+  def __init__(self, num_candidates, time_budget, slate_size, seed=0, sample_seed=0):
     super(FlashcardUserModel, self).__init__(
         UserResponse, UserSampler(
             UserState, num_candidates, time_budget, 
-            seed=seed
+            seed=sample_seed
         ), slate_size)
     self.choice_model = MultinomialLogitChoiceModel({})
+    self._rng = np.random.RandomState(seed)
 
   def is_terminal(self):
     terminated = self._user_state._time > self._user_state._time_budget
@@ -52,7 +53,8 @@ class FlashcardUserModel(user.AbstractUserModel):
     doc_id = doc._doc_id
     W = self._user_state._W[doc_id]
     if not W.any(): # uninitialzed
-      self._user_state._W[doc_id] = W = doc.base_difficulty * np.random.uniform(0.5, 2.0, (1, 3)) # a uniform error for each user
+      error = self._user_state._doc_error[doc_id] # a uniform error for each user
+      self._user_state._W[doc_id] = W = doc.base_difficulty * error
       print(W)
     # use exponential function to simulate whether the user recalls
     last_review = self._user_state._time - self._user_state._last_review[doc_id]
@@ -60,6 +62,6 @@ class FlashcardUserModel(user.AbstractUserModel):
 
     pr = np.exp(-last_review / np.exp(np.dot(W, x))).squeeze()
     print(f"time: {self._user_state._time}, reviewing flashcard {doc_id}, recall rate = {pr}")
-    if np.random.rand() < pr: # remembered
+    if self._rng.random_sample() < pr: # remembered
       response._recall = True
     response._pr = pr

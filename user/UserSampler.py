@@ -7,9 +7,13 @@ class UserSampler(user.AbstractUserSampler):
                num_candidates=10,
                time_budget=60,
                **kwargs):
-    self._state_parameters = {'num_candidates': num_candidates, 'time_budget': time_budget}
     super(UserSampler, self).__init__(user_ctor, **kwargs)
-
+    doc_error = self._rng.uniform(0.5, 1.5, (num_candidates, 3))
+    self._state_parameters = {
+      'num_candidates': num_candidates, 
+      'time_budget': time_budget,
+      'doc_error': doc_error
+    }
 
   def sample_user(self):
     return self._user_ctor(**self._state_parameters)
