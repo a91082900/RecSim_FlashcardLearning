@@ -6,7 +6,7 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
   def __init__(self, sess, observation_space, action_space, eval_mode, alpha=1.0, learning_rate=0.001, summary_writer=None):
     super(UCBAgent, self).__init__(action_space, summary_writer)
     self._num_candidates = int(action_space.nvec[0])
-    self._W = tf.Variable(np.random.normal(size=(self._num_candidates, 3)), name='W')
+    self._W = tf.Variable(np.random.uniform(0, 10, size=(self._num_candidates, 3)), name='W')
     self._sess = sess
     self._return_idx = None
     self._prev_pred_pr = None
