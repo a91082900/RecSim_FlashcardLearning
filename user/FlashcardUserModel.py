@@ -78,3 +78,11 @@ class FlashcardUserModel(user.AbstractUserModel):
     if self._rng.random_sample() < pr: # remembered
       response._recall = True
     response._pr = pr
+  
+  def recv_docs(self, docs):
+    # initialize Ws
+    for doc_id in docs:
+      did = int(doc_id)
+      error = self._user_state._doc_error[did] # a uniform error for each user
+      self._user_state._W[did] = docs[doc_id] * error
+      print(doc_id, docs[doc_id])
