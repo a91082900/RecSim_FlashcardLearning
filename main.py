@@ -5,16 +5,18 @@ from document import FlashcardDocumentSampler
 from recsim.simulator import recsim_gym
 from recsim.agents import full_slate_q_agent
 from recsim.simulator import runner_lib
-from agent import create_agent_helper
+from agent import *
 from util import reward, update_metrics
 
 slate_size = 1
 num_candidates = 10
 time_budget = 60
+eval_delay_time = 10
 
 tf.compat.v1.disable_eager_execution()
 
-create_agent_fn = create_agent_helper(full_slate_q_agent.FullSlateQAgent)
+create_agent_fn = create_agent_helper(UCBAgent, 
+  alpha=0.3, learning_rate=0.003, eval_delay_time=eval_delay_time)
 
 ltsenv = environment.Environment(
   FlashcardUserModel(num_candidates, time_budget, slate_size, seed=0, sample_seed=0),
