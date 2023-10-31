@@ -19,17 +19,19 @@ def update_metrics(responses, metrics, info):
     # print(metrics)
     return metrics
 
-def eval_result(train_time, last_review, history, W):
+def eval_result(eval_time, last_review, history, W):
     with open(f"{datetime.now()}.txt", "w") as f:
-        print(train_time, file=f)
+        print(eval_time, file=f)
         print(last_review, file=f)
         print(history, file=f)
         print(W, file=f)
         # np.einsum('ij,ij->i', a, b)
-        last_review = train_time - last_review
+        last_review = eval_time - last_review
         mem_param = np.exp(np.einsum('ij,ij->i', history, W))
         pr = np.exp(-last_review / mem_param)
         print(pr, file=f)
         print(pr)
-        print("score:", np.sum(pr) / pr.shape[0], file=f)
-        print("score:", np.sum(pr) / pr.shape[0])
+        score = np.sum(pr) / pr.shape[0]
+        print("score:", score, file=f)
+        print("score:", score)
+    return (eval_time, pr, score)

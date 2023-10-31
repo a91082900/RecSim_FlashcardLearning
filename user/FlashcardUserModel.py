@@ -7,7 +7,7 @@ from util import eval_result
 import numpy as np
 
 class FlashcardUserModel(user.AbstractUserModel):
-  def __init__(self, num_candidates, time_budget, slate_size, seed=0, sample_seed=0):
+  def __init__(self, num_candidates, time_budget, slate_size, eval_delay_time=0, seed=0, sample_seed=0):
     super(FlashcardUserModel, self).__init__(
         UserResponse, UserSampler(
             UserState, num_candidates, time_budget, 
@@ -15,11 +15,12 @@ class FlashcardUserModel(user.AbstractUserModel):
         ), slate_size)
     self.choice_model = MultinomialLogitChoiceModel({})
     self._rng = np.random.RandomState(seed)
+    self._eval_delay_time = eval_delay_time
 
   def is_terminal(self):
     terminated = self._user_state._time > self._user_state._time_budget
     if terminated: # run evaluation process
-      eval_result(self._user_state._time,
+      eval_result(self._user_state._time_budget + self._eval_delay_time,
                   self._user_state._last_review.copy(),
                   self._user_state._history.copy(),
                   self._user_state._W.copy())

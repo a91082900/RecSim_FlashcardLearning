@@ -19,7 +19,8 @@ create_agent_fn = create_agent_helper(UCBAgent,
   alpha=0.3, learning_rate=0.003, eval_delay_time=eval_delay_time)
 
 ltsenv = environment.Environment(
-  FlashcardUserModel(num_candidates, time_budget, slate_size, seed=0, sample_seed=0),
+  FlashcardUserModel(num_candidates, time_budget, 
+    slate_size, eval_delay_time=eval_delay_time, seed=0, sample_seed=0),
   FlashcardDocumentSampler(seed=0),
   num_candidates,
   slate_size,
