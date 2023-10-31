@@ -19,7 +19,7 @@ def update_metrics(responses, metrics, info):
     # print(metrics)
     return metrics
 
-def eval_result(eval_time, last_review, history, W):
+def eval_result(eval_time, last_review, history, W, callback=None):
     with open(f"{datetime.now()}.txt", "w") as f:
         print(eval_time, file=f)
         print(last_review, file=f)
@@ -34,4 +34,7 @@ def eval_result(eval_time, last_review, history, W):
         score = np.sum(pr) / pr.shape[0]
         print("score:", score, file=f)
         print("score:", score)
+
+    if callable(callback):
+        callback(eval_time, pr, score)
     return (eval_time, pr, score)
