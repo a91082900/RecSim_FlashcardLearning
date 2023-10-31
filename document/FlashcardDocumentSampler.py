@@ -1,5 +1,6 @@
 from .FlashcardDocument import FlashcardDocument
 from recsim import document
+import numpy as np
 
 class FlashcardDocumentSampler(document.AbstractDocumentSampler):
   def __init__(self, doc_ctor=FlashcardDocument, seed=0, **kwargs):
@@ -9,6 +10,7 @@ class FlashcardDocumentSampler(document.AbstractDocumentSampler):
   def sample_document(self):
     doc_features = {}
     doc_features['doc_id'] = self._doc_count
-    doc_features['difficulty'] = self._rng.uniform(0, 3, (1, 3))
+    difficulty = [1, self._rng.uniform(1.5, 5), self._rng.uniform(0.75, 2.5)]
+    doc_features['difficulty'] = np.array(difficulty)
     self._doc_count += 1
     return self._doc_ctor(**doc_features)

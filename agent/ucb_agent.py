@@ -15,7 +15,6 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     self._alpha = alpha
     self._deadline = None
     self._eval_delay_time = eval_delay_time # eval at T + s
-    print(self._alpha, self._eval_delay_time)
   
     assert self._slate_size == 1
   def begin_episode(self, observation=None):
