@@ -3,7 +3,8 @@ import tensorflow as tf
 import numpy as np
 
 class UCBAgent(AbstractEpisodicRecommenderAgent):
-  def __init__(self, sess, observation_space, action_space, eval_mode, alpha=1.0, learning_rate=0.001, summary_writer=None):
+  def __init__(self, sess, observation_space, action_space, eval_mode, 
+      eval_delay_time=0, alpha=1.0, learning_rate=0.001, summary_writer=None):
     super(UCBAgent, self).__init__(action_space, summary_writer)
     self._num_candidates = int(action_space.nvec[0])
     self._W = tf.Variable(np.random.uniform(0, 10, size=(self._num_candidates, 3)), name='W')
@@ -12,8 +13,14 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     self._prev_pred_pr = None
     self._opt = tf.compat.v1.train.GradientDescentOptimizer(learning_rate)
     self._alpha = alpha
+    self._deadline = None
+    self._eval_delay_time = eval_delay_time # eval at T + s
   
     assert self._slate_size == 1
+  def begin_episode(self, observation=None):
+    self._deadline = observation['user']['time_budget']
+    self._episode_num += 1
+    return self.step(0, observation)
   def step(self, reward, observation):
     docs = observation['doc']
     user = observation['user']
@@ -33,8 +40,11 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     history_neg = user['history'].copy()
     history_neg[:, [0, 2]] += 1 # add n, n- by 1
     last_review_now = np.repeat(user['time'], len(user['last_review']))
-    pr_pos = self.calc_prs(time, last_review_now, history_pos, self._W)
-    pr_neg = self.calc_prs(time, last_review_now, history_neg, self._W)
+
+    # always evaluate at deadline + eval_delay_time
+    eval_time = self._deadline + self._eval_delay_time
+    pr_pos = self.calc_prs(eval_time, last_review_now, history_pos, self._W)
+    pr_neg = self.calc_prs(eval_time, last_review_now, history_neg, self._W)
 
     gain = (pr_pos + pr_neg) / 2 - base_pr
     time_since_last_review = user['time'] - user['last_review']
