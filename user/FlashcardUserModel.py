@@ -7,7 +7,8 @@ from util import eval_result
 import numpy as np
 
 class FlashcardUserModel(user.AbstractUserModel):
-  def __init__(self, num_candidates, time_budget, slate_size, eval_delay_time=0, seed=0, sample_seed=0):
+  def __init__(self, num_candidates, time_budget, slate_size, 
+    eval_delay_time=0, training_param=None, seed=0, sample_seed=0):
     super(FlashcardUserModel, self).__init__(
         UserResponse, UserSampler(
             UserState, num_candidates, time_budget, 
@@ -16,6 +17,7 @@ class FlashcardUserModel(user.AbstractUserModel):
     self.choice_model = MultinomialLogitChoiceModel({})
     self._rng = np.random.RandomState(seed)
     self._eval_delay_time = eval_delay_time
+    self.training_param = training_param
 
   def is_terminal(self):
     terminated = self._user_state._time >= self._user_state._time_budget
@@ -31,9 +33,13 @@ class FlashcardUserModel(user.AbstractUserModel):
     with open(filename, "a+") as f:
       f.seek(0)
       if f.readline() == '':
-        f.write("T,n,s,eval_time,score,p")
+        f.write("lr,alpha,T,n,s,eval_time,score,p")
         f.write(',p'.join(map(str, range(1, 31))))
         f.write("\n")
+      if self.training_param != None and len(self.training_param) == 2:
+        f.write(f"{self.training_param[0]},{self.training_param[1]},")
+      else:
+        f.write(",,")
       f.write(f"{self._user_state._time_budget},{self._user_state._cards},{self._eval_delay_time},{eval_time},{score},")
       f.write(",".join(map(str, pr)))
       f.write("\n")
