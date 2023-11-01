@@ -18,7 +18,7 @@ class FlashcardUserModel(user.AbstractUserModel):
     self._eval_delay_time = eval_delay_time
 
   def is_terminal(self):
-    terminated = self._user_state._time > self._user_state._time_budget
+    terminated = self._user_state._time >= self._user_state._time_budget
     if terminated: # run evaluation process
       eval_result(self._user_state._time_budget + self._eval_delay_time,
                   self._user_state._last_review.copy(),
