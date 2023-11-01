@@ -60,10 +60,11 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
 
     # always evaluate at deadline + eval_delay_time
     eval_time = self._deadline + self._eval_delay_time
+    pr = self.calc_prs(eval_time, user['last_review'], user['history'], self._W)
     pr_pos = self.calc_prs(eval_time, last_review_now, history_pos, self._W)
     pr_neg = self.calc_prs(eval_time, last_review_now, history_neg, self._W)
 
-    gain = (pr_pos + pr_neg) / 2 - base_pr
+    gain = (pr_pos + pr_neg) / 2 - pr
     time_since_last_review = user['time'] - user['last_review']
     uncertainty = self._alpha * tf.math.sqrt(tf.math.log(time_since_last_review) / user['history'][:, 0])
     # print(gain.eval(session=self._sess))
