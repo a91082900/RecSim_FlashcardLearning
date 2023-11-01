@@ -67,7 +67,7 @@ class FlashcardUserModel(user.AbstractUserModel):
     W = self._user_state._W[doc_id]
     if not W.any(): # uninitialzed
       error = self._user_state._doc_error[doc_id] # a uniform error for each user
-      self._user_state._W[doc_id] = W = doc.base_difficulty * error
+      self._user_state._W[doc_id] = W = doc.base_difficulty + error
       print(W)
     # use exponential function to simulate whether the user recalls
     last_review = self._user_state._time - self._user_state._last_review[doc_id]
@@ -84,5 +84,5 @@ class FlashcardUserModel(user.AbstractUserModel):
     for doc_id in docs:
       did = int(doc_id)
       error = self._user_state._doc_error[did] # a uniform error for each user
-      self._user_state._W[did] = docs[doc_id] * error
+      self._user_state._W[did] = docs[doc_id] + error
       print(doc_id, docs[doc_id])
