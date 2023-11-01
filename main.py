@@ -1,5 +1,6 @@
 import tensorflow as tf
-from recsim.simulator import environment
+# from recsim.simulator import environment
+from environment import environment
 from user import FlashcardUserModel
 from document import FlashcardDocumentSampler
 from recsim.simulator import recsim_gym
@@ -18,7 +19,8 @@ tf.compat.v1.disable_eager_execution()
 create_agent_fn = create_agent_helper(UCBAgent, 
   alpha=0.3, learning_rate=0.003, eval_delay_time=eval_delay_time)
 
-ltsenv = environment.Environment(
+#ltsenv = environment.Environment(
+ltsenv = environment.DocAccessibleEnvironment(
   FlashcardUserModel(num_candidates, time_budget, 
     slate_size, eval_delay_time=eval_delay_time, seed=0, sample_seed=0),
   FlashcardDocumentSampler(seed=0),
