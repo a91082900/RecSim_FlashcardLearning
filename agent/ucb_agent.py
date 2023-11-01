@@ -15,10 +15,27 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     self._alpha = alpha
     self._deadline = None
     self._eval_delay_time = eval_delay_time # eval at T + s
-  
+
     assert self._slate_size == 1
   def begin_episode(self, observation=None):
-    self._deadline = observation['user']['time_budget']
+    docs = observation['doc']
+    user = observation['user']
+
+    self._deadline = user['time_budget']
+
+    if 'W' in user:
+      assign = self._W.assign(user['W'])
+      self._sess.run(assign)
+    else:
+      w = []
+      for doc_id in docs:
+        w.append(docs[doc_id])
+      w = np.array(w).reshape((-1, 3))
+      print("observe from docs")
+      assign = self._W.assign(w)
+      self._sess.run(assign)
+      print(self._W.eval(session=self._sess))
+
     self._episode_num += 1
     return self.step(0, observation)
   def step(self, reward, observation):
