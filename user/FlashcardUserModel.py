@@ -80,7 +80,7 @@ class FlashcardUserModel(user.AbstractUserModel):
     x = self._user_state._history[doc_id]
 
     pr = np.exp(-last_review / np.exp(np.dot(W, x))).squeeze()
-    print(f"time: {self._user_state._time}, reviewing flashcard {doc_id}, recall rate = {pr}")
+    print(f"time: {self._user_state._time:02d}, reviewing flashcard {doc_id:02d}, recall rate = {pr:.14f}", end="\r")
     if self._rng.random_sample() < pr: # remembered
       response._recall = True
     response._pr = pr
@@ -91,4 +91,4 @@ class FlashcardUserModel(user.AbstractUserModel):
       did = int(doc_id)
       error = self._user_state._doc_error[did] # a uniform error for each user
       self._user_state._W[did] = docs[doc_id] + error
-      print(doc_id, docs[doc_id])
+      # print(doc_id, docs[doc_id])

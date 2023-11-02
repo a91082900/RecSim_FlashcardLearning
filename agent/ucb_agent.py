@@ -31,10 +31,10 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
       for doc_id in docs:
         w.append(docs[doc_id])
       w = np.array(w).reshape((-1, 3))
-      print("observe from docs")
+      # print("observe from docs")
       assign = self._W.assign(w)
       self._sess.run(assign)
-      print(self._W.eval(session=self._sess))
+      # print(self._W.eval(session=self._sess))
 
     self._episode_num += 1
     return self.step(0, observation)
@@ -67,12 +67,10 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     gain = (pr_pos + pr_neg) / 2 - pr
     time_since_last_review = user['time'] - user['last_review']
     uncertainty = self._alpha * tf.math.sqrt(tf.math.log(time_since_last_review) / user['history'][:, 0])
-    # print(gain.eval(session=self._sess))
-    # print(time_since_last_review)
-    # print(uncertainty.eval(session=self._sess))
+
     ucb_score = gain + uncertainty
-    print("       gain:", gain.eval(session=self._sess))
-    print("uncertainty:", uncertainty.eval(session=self._sess))
+    # print("       gain:", gain.eval(session=self._sess))
+    # print("uncertainty:", uncertainty.eval(session=self._sess))
     best_idx = tf.argmax(ucb_score)
 
     self._return_idx = self._sess.run(best_idx)

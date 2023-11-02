@@ -23,11 +23,17 @@ tf.compat.v1.disable_eager_execution()
 lr_range = (0.0001, 1)
 alpha_range = (0.0001, 10)
 
-for _ in range(100):
-  log_lr_range = np.log(lr_range)
-  log_alpha_range = np.log(alpha_range)
-  lr = np.exp(np.random.uniform(*log_lr_range))
-  alpha = np.exp(np.random.uniform(*log_alpha_range))
+log_lr_range = np.log(lr_range)
+log_alpha_range = np.log(alpha_range)
+log_lrs = np.arange(log_lr_range[0], log_lr_range[1]+1e-3, 
+  (log_lr_range[1]-log_lr_range[0])/20)
+log_alphas = np.arange(log_alpha_range[0], log_alpha_range[1]+1e-3, 
+  (log_alpha_range[1]-log_alpha_range[0])/20)
+
+for i in range(len(log_alphas)):
+  print(f"trial {i:02d}")
+  lr = 0.01 #np.exp(np.random.uniform(*log_lr_range))
+  alpha = np.exp(log_alphas[i])
 
   create_agent_fn = create_agent_helper(UCBAgent, 
     alpha=alpha, learning_rate=lr, eval_delay_time=eval_delay_time)
