@@ -65,10 +65,6 @@ class FlashcardUserModel(user.AbstractUserModel):
     # W = np.array([1,1,1])
     doc_id = doc._doc_id
     W = self._user_state._W[doc_id]
-    if not W.any(): # uninitialzed
-      error = self._user_state._doc_error[doc_id] # a uniform error for each user
-      self._user_state._W[doc_id] = W = doc.base_difficulty + error
-      print(W)
     # use exponential function to simulate whether the user recalls
     last_review = self._user_state._time - self._user_state._last_review[doc_id]
     x = self._user_state._history[doc_id]
@@ -80,6 +76,7 @@ class FlashcardUserModel(user.AbstractUserModel):
     response._pr = pr
   
   def recv_docs(self, docs):
+    return # no need to initialize with docs
     # initialize Ws
     for doc_id in docs:
       did = int(doc_id)
