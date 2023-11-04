@@ -15,6 +15,8 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     self._alpha = alpha
     self._deadline = None
     self._eval_delay_time = eval_delay_time # eval at T + s
+    self._history_x = [] # list of (time_since_last_review, history)
+    self._history_y = []
 
     assert self._slate_size == 1
   def begin_episode(self, observation=None):
@@ -22,6 +24,8 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     user = observation['user']
 
     self._deadline = user['time_budget']
+    self._history_x = [([], []) for _ in range(len(docs))]
+    self._history_y = [[] for _ in range(len(docs))]
 
     if 'W' in user:
       assign = self._W.assign(user['W'])
@@ -45,11 +49,23 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
 
     if self._return_idx != None and response != None:
       # update w
-      y_true = [response[0]['recall']]
-      y_pred = self._prev_pred_pr
+      self._history_y[self._return_idx].append(response[0]['recall'])
+      y_true = self._history_y[self._return_idx]
+      # use same W to predict all results
+      time_since_last_review, history = self._history_x[self._return_idx]
+      history = np.array(history)
+      wi = self._W[self._return_idx]
+
+      print("history =", history)
+      print("y_history =", y_true)
+      mem_param = tf.math.exp(tf.reduce_sum(history * wi, axis=1))
+      y_pred = tf.math.exp(-(time_since_last_review / mem_param))
       loss = tf.losses.binary_crossentropy(y_true, y_pred)
       self._sess.run(self._opt.minimize(loss))
-    base_pr = self.calc_prs(user['time'], user['last_review'], user['history'], self._W)
+      print("y_pred:", y_pred.eval(session=self._sess))
+      print("loss:", loss.eval(session=self._sess))
+      print("w:", self._W.eval(session=self._sess))
+    # base_pr = self.calc_prs(user['time'], user['last_review'], user['history'], self._W)
 
     time = user['time'] + 1
     history_pos = user['history'].copy()
@@ -74,7 +90,9 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
     best_idx = tf.argmax(ucb_score)
 
     self._return_idx = self._sess.run(best_idx)
-    self._prev_pred_pr = base_pr[self._return_idx]
+    # save history
+    self._history_x[self._return_idx][0].append(user['time'] - user['last_review'][self._return_idx])
+    self._history_x[self._return_idx][1].append(user['history'][self._return_idx].copy())
     return [self._return_idx]
 
     
