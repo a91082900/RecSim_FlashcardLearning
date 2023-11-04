@@ -56,15 +56,15 @@ class UCBAgent(AbstractEpisodicRecommenderAgent):
       history = np.array(history)
       wi = self._W[self._return_idx]
 
-      print("history =", history)
-      print("y_history =", y_true)
+      # print("history =", history)
+      # print("y_history =", y_true)
       mem_param = tf.math.exp(tf.reduce_sum(history * wi, axis=1))
       y_pred = tf.math.exp(-(time_since_last_review / mem_param))
       loss = tf.losses.binary_crossentropy(y_true, y_pred)
       self._sess.run(self._opt.minimize(loss))
-      print("y_pred:", y_pred.eval(session=self._sess))
-      print("loss:", loss.eval(session=self._sess))
-      print("w:", self._W.eval(session=self._sess))
+      # print("y_pred:", y_pred.eval(session=self._sess))
+      # print("loss:", loss.eval(session=self._sess))
+      # print("w:", self._W.eval(session=self._sess))
     # base_pr = self.calc_prs(user['time'], user['last_review'], user['history'], self._W)
 
     time = user['time'] + 1
